@@ -100,6 +100,7 @@ class RectChatView(ctx : Context) : View(ctx) {
         }
 
         fun draw(canvas : Canvas, paint : Paint) {
+            prev?.draw(canvas, paint)
             paint.color = Color.parseColor("#e67e22")
             val w : Float = canvas.width.toFloat()
             val h : Float = canvas.height.toFloat()
@@ -144,6 +145,30 @@ class RectChatView(ctx : Context) : View(ctx) {
             }
             cb()
             return this
+        }
+    }
+
+    data class RectChat (var i : Int) {
+
+        var curr : RectChatNode = RectChatNode(0)
+
+        var dir : Int = 1
+
+        fun draw(canvas : Canvas, paint : Paint) {
+            curr.draw(canvas, paint)
+        }
+
+        fun update(stopcb : (Float) -> Unit) {
+            curr.update {
+                curr = curr.getNext(dir) {
+                    dir *= -1
+                }
+                stopcb(it)
+            }
+        }
+
+        fun startUpdating(startcb : () -> Unit) {
+            curr.startUpdating(startcb)
         }
     }
 }
