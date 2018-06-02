@@ -96,7 +96,7 @@ class RectChatView(ctx : Context) : View(ctx) {
         }
 
         fun addNeighbor() {
-            if (i < RECT_CHAT_NODES) {
+            if (i < RECT_CHAT_NODES - 1) {
                 next = RectChatNode(i + 1)
                 next?.prev = this
             }
@@ -111,13 +111,13 @@ class RectChatView(ctx : Context) : View(ctx) {
             val y : Float = 1.5f * h_Gap + (i * 2 * h_Gap)
             canvas.save()
             canvas.translate(w/2, y)
-            canvas.scale(1f - 2 * i, 1f)
+            canvas.scale(1f - 2 * (i%2), 1f)
             canvas.save()
             canvas.translate(-w/2, 0f)
-            canvas.drawCircle(h_Gap, 0f, h_Gap * state.scales[0], paint)
+            canvas.drawCircle(h_Gap, 0f, (h_Gap / 3) * state.scales[0], paint)
             canvas.save()
             val clipPath : Path = Path()
-            clipPath.addRect(RectF(h_Gap * 2, -h_Gap/2, w, h_Gap/2), Path.Direction.CCW)
+            clipPath.addRect(RectF(h_Gap * 2, -h_Gap/2, w * state.scales[1], h_Gap/2), Path.Direction.CCW)
             canvas.clipPath(clipPath)
             val path : Path = Path()
             path.moveTo(h_Gap * 2, 0f)
