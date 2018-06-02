@@ -43,5 +43,12 @@ class RectChatView(ctx : Context) : View(ctx) {
                 }
             }
         }
+
+        fun startUpdating(startcb : () -> Unit) {
+            if (dir == 0f) {
+                dir = 1 - 2 * prevScale
+                startcb()
+            }
+        }
     }
 }
