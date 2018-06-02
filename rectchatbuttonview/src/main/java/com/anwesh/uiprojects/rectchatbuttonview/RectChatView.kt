@@ -171,4 +171,27 @@ class RectChatView(ctx : Context) : View(ctx) {
             curr.startUpdating(startcb)
         }
     }
+
+    data class Renderer(var view : RectChatView) {
+
+        private val animator : Animator = Animator(view)
+
+        private val rectChat : RectChat = RectChat(0)
+
+        fun render(canvas : Canvas, paint : Paint) {
+            canvas.drawColor(Color.parseColor("#212121"))
+            rectChat.draw(canvas, paint)
+            animator.animate {
+                rectChat.update {
+                    animator.stop()
+                }
+            }
+        }
+
+        fun handleTap() {
+            rectChat.startUpdating {
+                animator.start()
+            }
+        }
+    }
 }
