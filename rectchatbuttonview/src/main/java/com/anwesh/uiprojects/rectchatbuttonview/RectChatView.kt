@@ -9,6 +9,8 @@ import android.content.Context
 import android.view.MotionEvent
 import android.graphics.*
 
+val RECT_CHAT_NODES : Int = 5
+
 class RectChatView(ctx : Context) : View(ctx) {
 
     private val paint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -28,7 +30,7 @@ class RectChatView(ctx : Context) : View(ctx) {
 
     data class State(var prevScale : Float = 0f, var dir : Float = 0f, var j : Int = 0) {
 
-        private val scales : Array<Float> = arrayOf(0f, 0f)
+        val scales : Array<Float> = arrayOf(0f, 0f)
 
         fun update(stopcb : (Float) -> Unit) {
             scales[j] += dir * 0.1f
@@ -77,6 +79,71 @@ class RectChatView(ctx : Context) : View(ctx) {
             if (animated) {
                 animated = false
             }
+        }
+    }
+
+    data class RectChatNode(var i : Int , val state : State = State()) {
+
+        private var next : RectChatNode? = null
+
+        private var prev : RectChatNode? = null
+
+        init {
+            addNeighbor()
+        }
+
+        fun addNeighbor() {
+            if (i < RECT_CHAT_NODES) {
+                next = RectChatNode(i + 1)
+                next?.prev = this
+            }
+        }
+
+        fun draw(canvas : Canvas, paint : Paint) {
+            paint.color = Color.parseColor("#e67e22")
+            val w : Float = canvas.width.toFloat()
+            val h : Float = canvas.height.toFloat()
+            val h_Gap : Float = (h) / (2 * RECT_CHAT_NODES + 1)
+            val y : Float = 1.5f * h_Gap + (i * 2 * h_Gap)
+            canvas.save()
+            canvas.translate(w/2, y)
+            canvas.scale(1f - 2 * i, 1f)
+            canvas.save()
+            canvas.translate(-w/2, 0f)
+            canvas.drawCircle(h_Gap, 0f, h_Gap * state.scales[0], paint)
+            canvas.save()
+            val clipPath : Path = Path()
+            clipPath.addRect(RectF(h_Gap * 2, -h_Gap/2, w, h_Gap/2), Path.Direction.CCW)
+            canvas.clipPath(clipPath)
+            val path : Path = Path()
+            path.moveTo(h_Gap * 2, 0f)
+            path.lineTo(h_Gap * 3, -h_Gap/2)
+            path.lineTo(h_Gap * 3, h_Gap/2)
+            canvas.drawPath(path, paint)
+            canvas.drawRect(RectF(3 * h_Gap, -h_Gap/2, w - h_Gap, h_Gap/2), paint)
+            canvas.restore()
+            canvas.restore()
+            canvas.restore()
+        }
+
+        fun update(stopcb : (Float) -> Unit) {
+            state.update(stopcb)
+        }
+
+        fun startUpdating(startcb : () -> Unit) {
+            state.startUpdating(startcb)
+        }
+
+        fun getNext(dir : Int, cb : () -> Unit) : RectChatNode {
+            var curr : RectChatNode? = prev
+            if (dir == 1) {
+                curr = next
+            }
+            if (curr != null) {
+                return curr
+            }
+            cb()
+            return this
         }
     }
 }
