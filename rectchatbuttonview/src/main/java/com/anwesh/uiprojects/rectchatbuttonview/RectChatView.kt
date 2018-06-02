@@ -4,6 +4,7 @@ package com.anwesh.uiprojects.rectchatbuttonview
  * Created by anweshmishra on 02/06/18.
  */
 
+import android.app.Activity
 import android.view.View
 import android.content.Context
 import android.view.MotionEvent
@@ -194,6 +195,13 @@ class RectChatView(ctx : Context) : View(ctx) {
             rectChat.startUpdating {
                 animator.start()
             }
+        }
+    }
+
+    companion object {
+        fun create(activity : Activity) {
+            val view : RectChatView = RectChatView(activity)
+            activity.setContentView(view)
         }
     }
 }
